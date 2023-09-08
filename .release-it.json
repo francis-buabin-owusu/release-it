@@ -25,7 +25,7 @@
                 "name": "conventionalcommits",
                 "types": [
                     {
-                        "type": "breaking_change",
+                        "type": "breaking",
                         "section": "New Api"
                     },
                     {

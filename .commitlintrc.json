@@ -6,6 +6,17 @@
       2,
       "always",
       [
+        "build",
+        "ci",
+        "docs",
+        "perf",
+        "refactor",
+        "revert",
+        "style",
+        "test",
+        "feat",
+        "fix",
+        "init",
         "feature",
         "patch",
         "breaking"

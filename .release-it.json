@@ -2,7 +2,7 @@
     "git": {
         "requireBranch": "production",
         "requireCleanWorkingDir": false,
-        "commitMessage": "release v${version}"
+        "commitMessage": "chore: release v${version}"
     },
     "github": {
         "release": true

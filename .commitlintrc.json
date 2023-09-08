@@ -20,7 +20,7 @@
         "init",
         "feature",
         "patch",
-        "breaking"
+        "breaking_change"
       ]
     ]
   }

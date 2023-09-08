@@ -1,5 +1,12 @@
 
 
+## [1.1.3](https://github.com/francis-buabin-owusu/release-it/compare/1.1.2...1.1.3) (2023-09-08)
+
+
+### New Api
+
+* **api:** hello new api ([d567a0f](https://github.com/francis-buabin-owusu/release-it/commit/d567a0f38f9fe429201e61c0889d19539dd85861))
+
 ## [1.1.2](https://github.com/francis-buabin-owusu/release-it/compare/1.1.1...1.1.2) (2023-09-08)
 
 

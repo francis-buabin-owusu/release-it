@@ -1,5 +1,7 @@
 
 
+## [1.0.3](https://github.com/francis-buabin-owusu/release-it/compare/1.0.2...1.0.3) (2023-09-08)
+
 ## 1.0.2 (2023-09-08)
 
 ## 1.0.1 (2023-09-08)

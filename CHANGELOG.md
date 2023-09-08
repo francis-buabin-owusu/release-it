@@ -1,5 +1,14 @@
 
 
+## [1.1.0](https://github.com/francis-buabin-owusu/release-it/compare/1.0.3...1.1.0) (2023-09-08)
+
+
+### Features
+
+* finished the new feature ([8f4840e](https://github.com/francis-buabin-owusu/release-it/commit/8f4840e44ec3da5e8bf8aec7cf623f0e813f2c83))
+* finished the new feature ([7802c38](https://github.com/francis-buabin-owusu/release-it/commit/7802c3851907d1c5425542a4132559ce542dd05c))
+* finished the new feature ([90c8aa7](https://github.com/francis-buabin-owusu/release-it/commit/90c8aa7c81ba8c6b7fdef7a27ed76fdad877bca5))
+
 ## [1.0.3](https://github.com/francis-buabin-owusu/release-it/compare/1.0.2...1.0.3) (2023-09-08)
 
 ## 1.0.2 (2023-09-08)

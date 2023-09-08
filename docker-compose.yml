@@ -1,0 +1,17 @@
+version: '3'
+services:
+  resource-management:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resource-management-service
+    ports:
+      - '4000:4000'
+    volumes:
+      - /app:/app/modules
+    networks:
+      - arms_network
+
+networks:
+  arms_network:
+    external: true

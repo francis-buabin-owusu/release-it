@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//enums
+enum Project_Status {
+  Not_Started
+  In_Progress
+  Completed
+  Suspended
+  Terminated
+}
+
+enum Project_Confirmation_Status {
+  Confirmed
+  Tentative
+}
+
+enum Project_Staffing_Status {
+  Not_Started
+  Awaiting_Confirmation
+  Completed
+}
+
+enum Billability_Status {
+  Billable
+  Not_Billable
+}
+
+enum Confirmation_Status {
+  Confirmed
+  Unconfirmed
+}
+
+enum Role {
+  Team_Lead
+  Member
+  Backup
+}
+
+model specialization {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  archive              Boolean                @default(false)
+  created_at           DateTime?              @default(now())
+  updated_at           DateTime?
+  archived_at          DateTime?
+  created_by           Int
+  updated_by           Int?
+  skills               skill[]
+  project_requirements project_requirements[]
+}
+
+model client {
+  id              Int                     @id @default(autoincrement())
+  client_name     String
+  description     String?
+  parent_id       Int?
+  currency        String
+  website         String
+  logo            String?
+  isOrganization  Boolean?                @default(false)
+  archive         Boolean                 @default(false)
+  created_at      DateTime                @default(now())
+  updated_at      DateTime?
+  archived_at     DateTime?
+  created_by      Int
+  updated_by      Int?
+  address         address?
+  bank            bank?
+  contact_person  client_contact_person[]
+  parent_client   client?                 @relation("clientToclient", fields: [parent_id], references: [id])
+  children_client client[]                @relation("clientToclient")
+  projects        project[]
+  offices         office[]
+}
+
+model address {
+  id             Int    @id @default(autoincrement())
+  client_id      Int    @unique
+  country        String
+  state_region   String
+  city           String
+  street_address String
+  zip_code       String
+  time_zone      String
+  client         client @relation(fields: [client_id], references: [id])
+}
+
+model bank {
+  id             Int    @id @default(autoincrement())
+  bank_name      String
+  account_name   String
+  account_number String
+  branch         String
+  swift_key      String
+  client_id      Int    @unique
+  client         client @relation(fields: [client_id], references: [id])
+}
+
+model client_contact_person {
+  id        Int    @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String
+  client_id Int
+  client    client @relation(fields: [client_id], references: [id])
+}
+
+model skill {
+  id              Int               @id @default(autoincrement())
+  name            String
+  validator_id    Int
+  archive         Boolean           @default(false)
+  created_at      DateTime?         @default(now())
+  updated_at      DateTime?
+  archived_at     DateTime?
+  created_by      Int
+  updated_by      Int?
+  specializations specialization[]
+  required_skills required_skills[]
+}
+
+model project {
+  id                          Int                     @id @default(autoincrement())
+  name                        String                  @unique
+  description                 String?
+  client_id                   Int
+  client                      client                  @relation(fields: [client_id], references: [id])
+  business_manager_id         Int
+  technical_manager_id        Int
+  // project_confirmation_status     Project_Confirmation_Status   @default(Tentative)
+  project_confirmation_status Boolean                 @default(false)
+  project_status              Project_Status          @default(Not_Started)
+  project_staffing_status     Project_Staffing_Status @default(Not_Started)
+  start_date                  DateTime?
+  end_date                    DateTime?
+  archive                     Boolean                 @default(false)
+  created_at                  DateTime?               @default(now())
+  updated_at                  DateTime?
+  archived_at                 DateTime?
+  created_by                  Int?
+  updated_by                  Int?
+  suspensionReason            String?
+  terminationReason           String?
+  project_requirements        project_requirements[]
+  project_staffs              project_staffs[]
+}
+
+// model position{
+//   id                Int                @id @default(autoincrement())
+//   name              String
+//   project_requirements  project_requirements[]
+// }
+
+model project_requirements {
+  id Int @id @default(autoincrement())
+
+  project_id Int
+  project    project @relation(fields: [project_id], references: [id])
+
+  specialization_id Int
+  specialization    specialization @relation(fields: [specialization_id], references: [id])
+
+  required_skills required_skills[]
+
+  position_id Int
+
+  employees_required Int
+}
+
+model required_skills {
+  id Int @id @default(autoincrement())
+
+  required_skills_id Int
+  required_skills    project_requirements @relation(fields: [required_skills_id], references: [id])
+
+  skill_id Int
+  skill    skill @relation(fields: [skill_id], references: [id])
+}
+
+model staff {
+  id             Int              @id @default(autoincrement())
+  user_id        Int              @unique
+  staff_projects project_staffs[]
+}
+
+model project_staffs {
+  id Int @id @default(autoincrement())
+
+  project_id Int
+  project    project @relation(fields: [project_id], references: [id])
+
+  staff_id Int
+  staff    staff @relation(fields: [staff_id], references: [user_id])
+
+  active              Boolean?            @default(false)
+  project_start_date  DateTime?
+  project_end_date    DateTime?
+  //Staff Confirmation Information
+  billability_status  Billability_Status  @default(Not_Billable)
+  confirmation_status Confirmation_Status @default(Unconfirmed)
+  role                Role                @default(Member)
+  project_hours       Int?
+}
+
+model employee_registry {
+  user_id         Int    @id
+  employee_id     String
+  full_name       String
+  position        String
+  department      String
+  specialization  String
+  location        String
+  employee_type   String
+  employee_status String
+}
+
+model office {
+  id              Int       @id @default(autoincrement())
+  organization_id Int
+  office_name     String
+  city            String
+  website         String?
+  phone_number    String?
+  created_at      DateTime? @default(now())
+  created_by      Int
+  updated_at      DateTime?
+  update_by       Int?
+  archive         Boolean   @default(false)
+  archived_at     DateTime?
+  organization    client    @relation(fields: [organization_id], references: [id] )
+}

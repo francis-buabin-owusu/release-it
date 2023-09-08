@@ -1,0 +1,51 @@
+{
+    "git": {
+        "requireBranch": "production",
+        "requireCleanWorkingDir": false,
+        "commitMessage": "release v${version}"
+    },
+    "github": {
+        "release": true
+    },
+    "npm": {
+        "publish": false
+    },
+    "hooks": {
+        "before:init": "git pull"
+    },
+    "@release-it/keep-a-changelog": {
+        "strictLatest": false,
+        "addVersionUrl": true,
+        "filename": "CHANGELOG.md"
+    },
+    "plugins": {
+        "@release-it/conventional-changelog": {
+            "infile": "CHANGELOG.md",
+            "preset": {
+                "name": "conventionalcommits",
+                "types": [
+                    {
+                        "type": "api",
+                        "section": "New Api"
+                    },
+                    {
+                        "type": "feature",
+                        "section": "Features"
+                    },
+                    {
+                        "type": "patch",
+                        "section": "Bug Fixes"
+                    },
+                    {
+                        "type": "fix",
+                        "hidden": true
+                    },
+                    {
+                        "type": "feat",
+                        "hidden": true
+                    }
+                ]
+            }
+        }
+    }
+}

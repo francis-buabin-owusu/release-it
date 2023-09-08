@@ -1,0 +1,9 @@
+node_modules
+.env
+.yarn
+yarn.lock
+dist
+src/helpers/sendEmail.ts
+coverage
+.idea/
+logs

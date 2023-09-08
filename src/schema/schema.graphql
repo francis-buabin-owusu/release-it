@@ -1,0 +1,614 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.0"
+    import: ["@key", "@shareable"]
+  )
+
+type Query {
+  specializations(data: paginationInput): [Specialization!]
+  getSpecialization(data: paginationInput): Specialization
+  clients(data: paginationInput): [Client!]
+  client(data: paginationInput): Client
+  getParentOrganizations(data: paginationInput): [Client]
+  selectSpecializations:[Specialization]
+  selectClients: [Client]
+  selectOrganizations: [Client]
+
+  listAllOffices: [Office]
+  getOffice(id: ID): Office!
+  filterOffice(data: officeInput): officeWithCount
+  selectOffices: [Office]
+
+  skills(data: paginationInput): [Skill]
+  skill(id: ID): Skill
+  selectSkills:[Skill]
+  projects(data: paginationInput): [Project]
+  project(data: ProjectInput): Project
+  user_on_project(id: ID): [project_staffs]
+  searchProject(name: String): [Project]
+  filterProjectStatus(data: filterData): ProjectWithCount
+  filterProjectDetails(data: filterDetailsPage): [project_staffs]
+  filterProjectDetailsWithStaff(data: filterDetailsPage): FilterProject
+  selectProjects: [Project]
+
+  filterSpecialization(data: AddSpecializationInput): SpecializationWithCount
+  filterSkill(data: SkillInput): SkillWithCount
+  filterClient(data: ClientInput): ClientWithCount
+  globalStaffing: [sortedStaff]
+  userCurrentProject(userId: ID): userCurrentProject
+
+  getMutipleClients(data: multipleClientsInpt): MultipleClients
+  getMultipleProjects(data: multipleProjectsInput): MultipleProjects
+  getManagerProject(userId: ID): ManagerProjects
+
+  resourceHealthCheck: String
+  resourceDBCheck: String
+
+  getUserInfo(userId: Int): UserDetails
+}
+
+type Position @key(fields: "id", resolvable: false) {
+  id: ID
+}
+
+type FilterProject {
+  project: Project
+  project_staffs: [project_staffs]
+  count: Int
+}
+
+type userCurrentProject {
+  staff: Staff
+  availableHours: Int
+  currentProjects: [project_staffs]
+  previousProjects: [project_staffs]
+  proposedProjects: [project_staffs]
+}
+
+type sortedStaff {
+  user_id: Int
+  utilizationPercentage: Int
+  availabilityPercentage: Int
+  twoMonthsAvailability: Boolean
+  billability: Boolean
+  currentProjects: sortedProject
+  proposedProjects: [project_staffs]
+  previousProjects: [project_staffs]
+}
+
+type sortedProject {
+  primaryProject: [project_staffs]
+  secondaryProject: [project_staffs]
+}
+
+type Mutation {
+  # Specialization Mutations
+  addSpecialization(data: AddSpecializationInput): Specialization!
+  updateSpecialization(data: UpdateSpecializationInput): Specialization!
+  archiveSpecialization(data: ArchiveInput): Specialization!
+
+  # Client Mutations
+  addClient(data: ClientInput): Client
+  updateClient(data: ClientInput): Client
+  archiveClient(data: ArchiveInput): Client
+
+  #Office Mutations
+  addOffice(data: officeInput): Office
+  updateOffice(data: officeInput): Office
+  archiveOffice(data: officeInput): Office
+
+  # Skill Mutations
+  addSkill(data: SkillInput): Skill!
+  updateSkill(data: UpdateSkillInput): Skill!
+  archiveSkill(data: ArchiveInput): Skill!
+
+  # Project Mutations
+  addProject(data: ProjectInput): Project!
+  updateProject(data: ProjectInput): Project!
+  archiveProject(data: ProjectInput): Project
+  confirmStaff(data: staffConfirmationInput): project_staffs
+  bulkStaffConfirm(data: bulkStaffConfirmationInput): [project_staffs]
+  removeStaff(data: removeStaffInput): project_staffs
+  addMoreStaffToProject(data: addMoreStaffToProjectInput): project_staffs
+  updateProjectStatus(data: ProjectInput): Project!
+  removeDeactivatedStaff(user_id: ID): ProjectDeactivatedStaff
+  updateProjectConfirmationStatus(data: ProjectInput): Project!
+  updateProjectStaffingStatus(data: ProjectInput): Project!
+}
+
+type Specialization @key(fields: "id") @shareable {
+  id: ID!
+  name: String
+  archive: Boolean
+  created_at: String
+  updated_at: String
+  archived_at: String
+  created_by: ID
+  updated_by: ID
+  createdBy: User
+  updatedBy: User
+  skills: [Skill]
+  project_requirements: [project_requirements]
+}
+
+type Client @key(fields: "id") @shareable {
+  id: ID!
+  client_name: String
+  description: String
+  parent_id: Int
+  currency: String
+  website: String
+  logo: String
+  isOrganization: Boolean
+  archive: Boolean
+  created_at: String
+  created_by: Int
+  createdBy: User
+  updated_at: String
+  update_by: Int
+  updatedBy: User
+  address: ClientAddress
+  bank: ClientBank
+  contact_person: [ClientContactPerson]
+  parent_client: Client
+  children_organization: [Client]
+  projects: [Project!]!
+  offices: [Office]
+}
+
+type ClientAddress {
+  id: ID!
+  client_id: Int
+  country: String
+  state_region: String
+  city: String
+  street_address: String
+  zip_code: String
+  time_zone: String
+  client: Client
+}
+
+type ClientBank {
+  id: ID
+  bank_name: String
+  account_name: String
+  account_number: String
+  branch: String
+  swift_key: String
+  client_id: Int
+  client: Client
+}
+
+type ClientContactPerson {
+  id: ID!
+  name: String
+  phone: String
+  email: String
+  client_id: Int
+  client: Client
+}
+
+type Skill @key(fields: "id") @shareable {
+  id: ID!
+  name: String
+  validator_id: Int
+  validator: User
+  archive: Boolean
+  created_at: String
+  updated_at: String
+  archived_at: String
+  created_by: Int!
+  updated_by: Int
+  createdBy: User
+  updatedBy: User
+  specializations: [Specialization]
+  required_skills: [required_skills]
+}
+
+type Project @key(fields: "id") @shareable {
+  id: ID!
+  name: String
+  description: String
+  business_manager_id: Int
+  business_manager: User
+  technical_manager_id: Int
+  technical_manager: User
+  # project_confirmation_status: Project_Confirmation_Status
+  project_confirmation_status: Boolean
+  project_status: Project_Status
+  project_staffing_status: Project_Staffing_Status
+  start_date: String
+  end_date: String
+  archive: Boolean
+  created_at: String
+  updated_at: String
+  archived_at: String
+  created_by: Int!
+  updated_by: Int
+  client_id: Int!
+  createdBy: User
+  updatedBy: User
+  client: Client
+  suspensionReason: String
+  terminationReason: String
+  project_requirements: [project_requirements]
+  project_staffs: [project_staffs]
+}
+
+type project_requirements @key(fields: "id") {
+  project_id: Int
+  project: [Project]
+
+  specialization_id: Int
+  specialization: Specialization
+
+  position_id: Int
+  position: Position
+
+  required_skills_id: Int
+  required_skills: [required_skills]
+
+  employees_required: Int
+
+  id: ID
+}
+
+type required_skills {
+  project_requirements__id: Int
+  project_requirements: project_requirements
+
+  skill_id: [Int]
+  skill: Skill
+
+  id: ID
+}
+
+type Office @key(fields: "id") @shareable {
+  id: ID
+  organization_id: Int
+  organization: Client
+  office_name: String
+  city: String
+  website: String
+  phone_number: String
+  created_at: String
+  created_by: Int
+  createdBy: User
+  updated_at: String
+  update_by: Int
+  updateBy: User
+  archive: Boolean
+  archived_at: String
+}
+
+type officeWithCount {
+  office: [Office]
+  count: Int
+}
+
+type User @key(fields: "id", resolvable: false) {
+  id: ID
+}
+
+type EmployeeInfo @key(fields: "user_id", resolvable: false) {
+  user_id: ID
+}
+
+type Staff {
+  user_id: ID
+  employee: EmployeeInfo
+  staff_projects: [project_staffs]
+}
+
+type project_staffs {
+  id: ID
+
+  project_id: Int
+  project: Project
+
+  staff_id: Int
+  staff: Staff
+
+  active: Boolean
+  project_start_date: String
+  project_end_date: String
+  # Staff Confirmation Information
+  billability_status: Billability_Status
+  confirmation_status: Confirmation_Status
+  role: Role
+  project_hours: Int
+}
+
+type GlobalStaffing {
+  currentProject: [GlobalStaffingProject]
+  proposedProject: [GlobalStaffingProject]
+  availability: Int
+}
+
+type GlobalStaffingProject {
+  client_id: Int
+  end_date: String
+  role: Role
+}
+
+#Count types
+type SpecializationWithCount {
+  specialization: [Specialization]
+  count: Int
+}
+
+type SkillWithCount {
+  skill: [Skill]
+  count: Int
+}
+
+type ClientWithCount {
+  client: [Client]
+  count: Int
+}
+
+type ProjectWithCount {
+  project: [Project]
+  count: Int
+}
+
+type ProjectDeactivatedStaff {
+  message: String
+}
+
+type MultipleClients {
+  data: [Client]
+}
+
+type MultipleProjects {
+  data: [Project]
+}
+
+type ManagerProjects {
+  data: [Project]
+}
+
+type UserDetails {
+  user_id: Int
+  user: User
+}
+
+# Specialization Input types
+input AddSpecializationInput {
+  name: String
+  archive: Boolean
+  created_by: Int
+  skip: Int
+  take: Int
+}
+
+input UpdateSpecializationInput {
+  id: ID!
+  name: String!
+  updated_by: Int!
+}
+
+input ArchiveInput {
+  id: ID!
+  updated_by: Int
+  archive: Boolean!
+}
+
+# Client Input types
+input ClientInput {
+  id: ID
+  client_name: String
+  description: String
+  parent_id: Int
+  currency: String
+  time_zone: String
+  website: String
+  logo: String
+  isOrganization: Boolean
+  created_by: Int
+  update_by: Int
+  country: String
+  archive: Boolean
+  state_region: String
+  city: String
+  street_address: String
+  zip_code: String
+  bank_name: String
+  account_name: String
+  account_number: String
+  branch: String
+  swift_key: String
+  contact_person: [ContactPersonInput]
+  skip: Int
+  take: Int
+}
+
+input ContactPersonInput {
+  name: String
+  email: String
+  phone: String
+}
+
+# Skills input types
+input SkillInput {
+  name: String
+  validator_id: Int
+  created_by: Int
+  specialization_ids: [Int]
+  archive: Boolean
+  skip: Int
+  take: Int
+}
+
+input UpdateSkillInput {
+  id: ID!
+  name: String
+  validator_id: Int
+  updated_by: Int
+  specialization_ids: [Int]
+}
+
+input ProjectInput {
+  id: ID
+  name: String
+  description: String
+  client_id: Int
+  business_manager_id: Int
+  technical_manager_id: Int
+  # project_confirmation_status: Project_Confirmation_Status
+  project_confirmation_status: Boolean
+  project_status: Project_Status
+  project_staffing_status: Project_Staffing_Status
+  created_by: Int
+  updated_by: Int
+  start_date: String
+  end_date: String
+  archive: Boolean
+  terminationReason: String
+  suspensionReason: String
+  requirements: [requirement]
+  staffs: [staff]
+  skip: Int
+  take: Int
+}
+
+input requirement {
+  specialization_id: Int
+  position_id: Int
+  skill_ids: [Int]
+  employees_required: Int
+}
+
+input staff {
+  user_id: Int
+}
+
+input staffConfirmationInput {
+  id: Int
+  billability_status: Billability_Status
+  confirmation_status: Confirmation_Status
+  role: Role
+  project_hours: Int
+  project_start_date: String
+  project_end_date: String
+  employee_email: String
+  employee_name: String
+  technical_manager_name: String
+  business_manager_name: String
+}
+
+input bulkStaffConfirmationInput {
+  confirmationDetails: [staffConfirmationInput]
+}
+
+input removeStaffInput {
+  id: Int
+  employee_name: String
+  employee_email: String
+}
+
+input officeInput {
+  id: Int
+  organization_id: Int
+  office_name: String
+  city: String
+  website: String
+  phone_number: String
+  archive: Boolean
+  created_by: Int
+  update_by: Int
+  skip: Int
+  take: Int
+}
+
+enum Project_Confirmation_Status {
+  Confirmed
+  Tentative
+}
+
+enum Project_Status {
+  Not_Started
+  In_Progress
+  Completed
+  Suspended
+  Terminated
+}
+
+enum Project_Staffing_Status {
+  Not_Started
+  Awaiting_Confirmation
+  Completed
+}
+
+enum Billability_Status {
+  Billable
+  Not_Billable
+}
+
+enum Confirmation_Status {
+  Confirmed
+  Unconfirmed
+}
+
+enum Role {
+  Team_Lead
+  Member
+  Backup
+}
+
+input registryInput {
+  user_id: Int
+  employee_id: String
+  full_name: String
+  position: String
+  department: String
+  specialization: String
+  location: String
+  employee_type: String
+  employee_status: String
+}
+
+input filterData {
+  confirmation_status: Boolean
+  project_status: String
+  staffing_status: String
+  archive: Boolean
+  skip: Int
+  take: Int
+  name: String
+  client_id: Int
+}
+
+input filterDetailsPage {
+  project_id: ID
+  billability_status: String
+  confirmation_status: String
+  role: String
+  active: Boolean
+  skip: Int
+  take: Int
+}
+
+input addMoreStaffToProjectInput {
+  project_id: Int
+  staff_id: Int
+}
+
+input GlobalStaffingInput {
+  user_id: Int
+}
+
+input paginationInput {
+  id: Int
+  skip: Int
+  take: Int
+  isOrganization: Boolean
+}
+
+input multipleClientsInpt {
+  client_ids: [Int]
+}
+
+input multipleProjectsInput {
+  project_ids: [Int]
+}

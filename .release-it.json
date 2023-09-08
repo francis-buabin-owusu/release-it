@@ -25,24 +25,16 @@
                 "name": "conventionalcommits",
                 "types": [
                     {
-                        "type": "api",
+                        "type": "breaking",
                         "section": "New Api"
                     },
                     {
-                        "type": "feature",
+                        "type": "feat",
                         "section": "Features"
                     },
                     {
-                        "type": "patch",
-                        "section": "Bug Fixes"
-                    },
-                    {
                         "type": "fix",
-                        "hidden": true
-                    },
-                    {
-                        "type": "feat",
-                        "hidden": true
+                        "section": "Bug Fixes"
                     }
                 ]
             }

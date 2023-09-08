@@ -6,20 +6,9 @@
       2,
       "always",
       [
-        "build",
-        "ci",
-        "docs",
-        "feat",
-        "fix",
-        "perf",
-        "refactor",
-        "revert",
-        "style",
-        "test",
-        "init",
-        "api",
         "feature",
-        "patch"
+        "patch",
+        "breaking"
       ]
     ]
   }

@@ -1,0 +1,32 @@
+name: Lock Branches
+
+on:
+  push:
+    branches:
+      - develop  # Modify this list to include the branches you want to lock
+
+jobs:
+  lock-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Lock Branches
+      run: |
+        # Define the list of branches to lock
+        branches_to_lock=("production" "staging" "testing", "develop")
+
+        for branch in "${branches_to_lock[@]}"; do
+          # Check if the branch exists
+          if git show-ref --verify --quiet "refs/heads/$branch"; then
+            # Lock the branch
+            git branch --lock "$branch"
+            echo "Locked branch: $branch"
+          else
+            echo "Branch not found: $branch"
+          fi
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
